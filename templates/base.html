@@ -1,0 +1,45 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Mentoring{% endblock %}</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="{% url 'mentoring:home' %}">🌍 Mentoring</a>
+      {% if user.is_authenticated and user.profile_completed %}
+      <nav class="nav">
+        <a href="{% url 'mentoring:mentor_list' %}">Find a mentor</a>
+        <a href="{% url 'mentoring:profile' %}">My profile</a>
+        {% if user.is_staff %}<a href="{% url 'mentoring:staff_dashboard' %}">Staff</a>{% endif %}
+        <a class="bell" href="{% url 'mentoring:notifications' %}" aria-label="Notifications{% if unread_notifications %} ({{ unread_notifications }} unread){% endif %}">
+          🔔{% if unread_notifications %}<span class="badge">{{ unread_notifications }}</span>{% endif %}
+        </a>
+      </nav>
+      {% endif %}
+    </div>
+  </header>
+
+  <main class="container">
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}<li class="message {{ message.tags }}">{{ message }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  {% if user.is_authenticated %}
+  <footer class="container footer">
+    <span>Signed in as {{ user.email }}</span>
+    <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}
+      <button class="link" type="submit">Sign out</button>
+    </form>
+  </footer>
+  {% endif %}
+</body>
+</html>

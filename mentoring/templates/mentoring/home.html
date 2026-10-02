@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Hi, {{ user.first_name }} 👋</h1>
+<p class="lead">What would you like to do?</p>
+
+<div class="grid two">
+  <a class="action-card" href="{% url 'mentoring:mentor_list' %}">
+    <span class="action-emoji">🔍</span>
+    <h2>Find a mentor</h2>
+    {% if mentor_rel %}
+    <p>Your mentor is {{ mentor_rel.mentor }}. Browse who else is available.</p>
+    {% else %}
+    <p>Browse people who are currently available to mentor and pick someone you'd like to talk to.</p>
+    {% endif %}
+  </a>
+
+  {% if mentor_profile %}
+  <a class="action-card" href="{% url 'mentoring:profile' %}#mentoring">
+    <span class="action-emoji">🌱</span>
+    <h2>You're a mentor</h2>
+    <p>
+      {% if mentor_profile.status == "paused" %}Paused ·{% endif %}
+      {{ mentee_rels|length }} of {{ mentor_profile.capacity }} place{{ mentor_profile.capacity|pluralize }} taken.
+      Manage your mentoring.
+    </p>
+  </a>
+  {% else %}
+  <a class="action-card" href="{% url 'mentoring:mentor_join' %}">
+    <span class="action-emoji">🌱</span>
+    <h2>Become a mentor</h2>
+    <p>Make yourself available to someone in the group. It takes three clicks, and you can pause or leave at any time.</p>
+  </a>
+  {% endif %}
+</div>
+
+{% if mentor_rel or mentee_rels %}
+<section class="section">
+  <h2>Your mentoring</h2>
+  <div class="stack">
+    {% if mentor_rel %}
+    <a class="person-row" href="{% url 'mentoring:profile' %}">
+      {% include "_avatar.html" with person=mentor_rel.mentor %}
+      <span><strong>{{ mentor_rel.mentor }}</strong><br><span class="muted">Your mentor · since {{ mentor_rel.started_at|date:"j M Y" }}</span></span>
+    </a>
+    {% endif %}
+    {% for rel in mentee_rels %}
+    <a class="person-row" href="{% url 'mentoring:profile' %}#mentoring">
+      {% include "_avatar.html" with person=rel.mentee %}
+      <span><strong>{{ rel.mentee }}</strong><br><span class="muted">Your mentee · since {{ rel.started_at|date:"j M Y" }}</span></span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

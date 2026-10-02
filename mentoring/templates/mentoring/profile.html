@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}My profile · Mentoring{% endblock %}
+{% block content %}
+<section class="panel profile-head">
+  {% include "_avatar.html" with person=user size="xl" %}
+  <div>
+    <h1>{{ user }}</h1>
+    <p class="muted">{{ user.get_career_stage_display }} · {{ user.research_topic }}</p>
+    <p><a href="{% url 'accounts:profile_edit' %}">Edit profile</a></p>
+  </div>
+</section>
+
+<section class="section">
+  <h2>Your mentor</h2>
+  {% if mentor_rel %}
+  {% with mentor=mentor_rel.mentor mp=mentor_rel.mentor.mentor_profile %}
+  <div class="card relation">
+    {% include "_avatar.html" with person=mentor size="lg" %}
+    <div class="relation-body">
+      <h3>{{ mentor }}</h3>
+      <p class="muted">{{ mentor.get_career_stage_display }} · {{ mentor.research_topic }}</p>
+      <p class="superpower">{{ mp.superpower_display }}</p>
+      <p class="muted">Your mentor since {{ mentor_rel.started_at|date:"j F Y" }}</p>
+      <p class="contact">
+        {% if mp.shows_slack %}<span>Slack: <strong>{{ mp.slack_handle }}</strong></span>{% endif %}
+        {% if mp.shows_email or not mp.shows_slack %}<a class="btn small" href="mailto:{{ mentor.email }}">Email {{ mentor.first_name }}</a>{% endif %}
+      </p>
+    </div>
+    <a class="btn small danger" href="{% url 'mentoring:end_relationship' mentor_rel.pk %}">End mentoring relationship</a>
+  </div>
+  {% endwith %}
+  {% else %}
+  <div class="card empty-card">
+    <p>You don't have a mentor at the moment.</p>
+    <a class="btn primary" href="{% url 'mentoring:mentor_list' %}">Find a mentor</a>
+  </div>
+  {% endif %}
+</section>
+
+<section class="section" id="mentoring">
+  <h2>Your mentoring</h2>
+  {% if mentor_profile %}
+  <p>
+    <span class="status {{ mentor_profile.status }}">
+      {% if mentor_profile.status == "paused" %}⏸ Paused{% elif mentor_profile.free_places %}🟢 Available{% else %}Full{% endif %}
+    </span>
+    {{ mentee_rels|length }} / {{ mentor_profile.capacity }} place{{ mentor_profile.capacity|pluralize }} taken
+    · {{ mentor_profile.superpower_display }}
+    · Contact: {{ mentor_profile.get_contact_preference_display }}{% if mentor_profile.shows_slack %} ({{ mentor_profile.slack_handle }}){% endif %}
+  </p>
+
+  <div class="stack">
+    {% for rel in mentee_rels %}
+    <div class="card relation">
+      {% include "_avatar.html" with person=rel.mentee size="lg" %}
+      <div class="relation-body">
+        <h3>{{ rel.mentee }}</h3>
+        <p class="muted">{{ rel.mentee.get_career_stage_display }} · {{ rel.mentee.research_topic }}</p>
+        <p class="muted">Your mentee since {{ rel.started_at|date:"j F Y" }}</p>
+        <p class="contact"><a class="btn small" href="mailto:{{ rel.mentee.email }}">Email {{ rel.mentee.first_name }}</a></p>
+      </div>
+      <a class="btn small danger" href="{% url 'mentoring:end_relationship' rel.pk %}">End mentoring relationship</a>
+    </div>
+    {% empty %}
+    <p class="muted">Nobody has chosen you yet. When someone does, they'll appear here and you'll get a notification.</p>
+    {% endfor %}
+  </div>
+
+  <div class="actions">
+    {% if mentor_profile.status == "paused" %}
+    <form method="post" action="{% url 'mentoring:resume_mentoring' %}">{% csrf_token %}<button class="btn primary" type="submit">Resume mentoring</button></form>
+    {% else %}
+    <form method="post" action="{% url 'mentoring:pause_mentoring' %}">{% csrf_token %}<button class="btn" type="submit">Pause mentoring</button></form>
+    {% endif %}
+    <a class="btn" href="{% url 'mentoring:mentor_join' %}">Edit settings</a>
+    <a class="btn danger" href="{% url 'mentoring:stop_mentoring' %}">Stop mentoring</a>
+  </div>
+  <p class="hint">Pausing keeps your current mentees but hides you from people looking for a mentor.</p>
+  {% else %}
+  <div class="card empty-card">
+    <p>You're not currently participating as a mentor.</p>
+    <a class="btn primary" href="{% url 'mentoring:mentor_join' %}">Become a mentor</a>
+  </div>
+  {% endif %}
+</section>
+
+<section class="section footer-links">
+  {% if has_history %}<a href="{% url 'mentoring:history' %}">Mentoring history</a>{% endif %}
+  {% if mentor_profile or mentor_rel %}<a class="danger-link" href="{% url 'mentoring:leave_program' %}">Leave mentoring program</a>{% endif %}
+</section>
+{% endblock %}

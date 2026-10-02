@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Notifications · Mentoring{% endblock %}
+{% block content %}
+<h1>Notifications</h1>
+<div class="stack">
+  {% for item in items %}
+  <div class="card notification{% if item.pk in unread_ids %} unread{% endif %}">
+    <span class="notification-icon">{{ item.icon }}</span>
+    <div>
+      <p>{{ item.message }}</p>
+      <p class="muted">{{ item.created_at|date:"j M Y, H:i" }}</p>
+    </div>
+  </div>
+  {% empty %}
+  <p class="empty">Nothing yet. You'll be told here when a mentoring match is made or ended.</p>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+<div class="field{% if field.errors %} has-error{% endif %}" id="field-{{ field.name }}">
+  {% if field.field.widget.input_type == "radio" %}
+  <fieldset>
+    <legend>{{ field.label }}</legend>
+    <div class="choices">
+      {% for radio in field %}
+      <label class="choice">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>
+      {% endfor %}
+    </div>
+  </fieldset>
+  {% else %}
+  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+  {{ field }}
+  {% endif %}
+  {% if field.help_text %}<p class="hint">{{ field.help_text }}</p>{% endif %}
+  {% for error in field.errors %}<p class="error">{{ error }}</p>{% endfor %}
+</div>

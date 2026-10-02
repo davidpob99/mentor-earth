@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Enter your code · Mentoring{% endblock %}
+{% block content %}
+<section class="panel narrow">
+  <h1>Check your email</h1>
+  <p class="lead">If <strong>{{ email }}</strong> has been invited, we've sent it a 6-digit code. It expires in 10 minutes.</p>
+  <form method="post" novalidate>{% csrf_token %}
+    {% include "_field.html" with field=form.code %}
+    <button class="btn primary block" type="submit">Sign in</button>
+  </form>
+  <p class="hint"><a href="{% url 'accounts:login' %}">Use a different email or request a new code</a></p>
+</section>
+{% endblock %}

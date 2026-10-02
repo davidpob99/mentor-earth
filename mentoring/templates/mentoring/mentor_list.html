@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Find a mentor · Mentoring{% endblock %}
+{% block content %}
+<h1>Find a mentor</h1>
+<p class="lead">Choose someone you'd like to talk to about research, career or academia.</p>
+
+{% if mentor_rel %}
+<p class="notice">Your current mentor is <strong>{{ mentor_rel.mentor }}</strong>. To choose someone else, end that mentoring relationship first from <a href="{% url 'mentoring:profile' %}">your profile</a>.</p>
+{% endif %}
+
+<form class="filters" method="get">
+  <div class="field"><label for="{{ form.research.id_for_label }}">{{ form.research.label }}</label>{{ form.research }}</div>
+  <div class="field"><label for="{{ form.stage.id_for_label }}">{{ form.stage.label }}</label>{{ form.stage }}</div>
+  <button class="btn" type="submit">Filter</button>
+  <a class="btn dice" href="?random=1" title="Show me three random mentors">🎲 Not sure?</a>
+</form>
+
+{% if random_pick %}
+<p class="notice">Here are three mentors picked at random. <a href="?random=1">Roll again</a> · <a href="{% url 'mentoring:mentor_list' %}">Show everyone</a></p>
+{% endif %}
+
+<div class="grid cards">
+  {% for profile in mentors %}
+    {% include "mentoring/_mentor_card.html" %}
+  {% empty %}
+    <p class="empty">
+      {% if filtered %}No available mentors match those filters. <a href="{% url 'mentoring:mentor_list' %}">Clear filters</a>
+      {% else %}Nobody is available to mentor right now. Check back soon, or <a href="{% url 'mentoring:mentor_join' %}">become the first mentor</a>.{% endif %}
+    </p>
+  {% endfor %}
+</div>
+{% endblock %}

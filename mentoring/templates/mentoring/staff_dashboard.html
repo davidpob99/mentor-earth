@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Staff · Mentoring{% endblock %}
+{% block content %}
+<h1>Mentoring program</h1>
+<div class="grid stats">
+  <div class="card stat"><strong>{{ n_participants }}</strong><span>invited participants</span></div>
+  <div class="card stat"><strong>{{ n_pending }}</strong><span>haven't signed in yet</span></div>
+  <div class="card stat"><strong>{{ mentors|length }}</strong><span>mentors</span></div>
+  <div class="card stat"><strong>{{ n_active_rels }}</strong><span>active relationships</span></div>
+</div>
+
+<section class="section">
+  <h2>Mentors</h2>
+  <table class="table">
+    <thead><tr><th>Mentor</th><th>Status</th><th>Places</th></tr></thead>
+    <tbody>
+      {% for profile in mentors %}
+      <tr><td>{{ profile.user }}</td><td>{{ profile.get_status_display }}</td><td>{{ profile.n_active }} / {{ profile.capacity }}</td></tr>
+      {% empty %}
+      <tr><td colspan="3" class="muted">No mentors yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="section">
+  <h2>Recent activity</h2>
+  <ul class="activity">
+    {% for when, text in events %}
+    <li>{{ text }} <span class="muted">· {{ when|date:"j M Y, H:i" }}</span></li>
+    {% empty %}
+    <li class="muted">Nothing yet.</li>
+    {% endfor %}
+  </ul>
+</section>
+
+<p><a class="btn" href="{% url 'admin:accounts_user_add' %}">Invite a participant</a> <a class="btn" href="{% url 'admin:index' %}">Open admin</a></p>
+{% endblock %}

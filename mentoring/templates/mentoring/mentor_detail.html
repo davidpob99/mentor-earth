@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ profile.user }} · Mentoring{% endblock %}
+{% block content %}
+<p><a href="{% url 'mentoring:mentor_list' %}">← Back to mentors</a></p>
+<section class="panel narrow center">
+  {% include "_avatar.html" with person=profile.user size="xl" %}
+  <h1>{{ profile.user }}</h1>
+  <p class="muted">{{ profile.user.get_career_stage_display }}</p>
+
+  <dl class="facts">
+    <dt>Research</dt><dd>{{ profile.user.research_topic }}</dd>
+    <dt>Research superpower</dt><dd>{{ profile.superpower_display }}</dd>
+    <dt>Availability</dt>
+    <dd>
+      {% if profile.is_available %}Available · {{ profile.free_places }} place{{ profile.free_places|pluralize }}
+      {% elif profile.status == "paused" %}Not taking new mentees right now
+      {% else %}Currently full{% endif %}
+    </dd>
+  </dl>
+
+  {% if is_self %}
+    <p class="notice">This is how others see you. <a href="{% url 'mentoring:profile' %}">Go to my profile</a></p>
+  {% elif is_my_mentor %}
+    <p class="notice">{{ profile.user.first_name }} is your mentor. <a href="{% url 'mentoring:profile' %}">See contact details</a></p>
+  {% elif mentor_rel %}
+    <p class="notice">You already have a mentor ({{ mentor_rel.mentor }}). End that mentoring relationship first to choose {{ profile.user.first_name }}.</p>
+  {% elif profile.is_available %}
+    <form method="post" action="{% url 'mentoring:choose_mentor' profile.user_id %}">{% csrf_token %}
+      <button class="btn primary block" type="submit">Choose {{ profile.user.first_name }} as my mentor</button>
+    </form>
+    <p class="hint">The match is made straight away and {{ profile.user.first_name }} is notified. Either of you can end it at any time.</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Mentoring history · Mentoring{% endblock %}
+{% block content %}
+<p><a href="{% url 'mentoring:profile' %}">← My profile</a></p>
+<h1>Mentoring history</h1>
+<div class="stack">
+  {% for rel in rels %}
+  <div class="person-row">
+    {% if rel.mentor_id == user.pk %}
+      {% include "_avatar.html" with person=rel.mentee %}
+      <span><strong>{{ rel.mentee }}</strong> · your mentee<br>
+    {% else %}
+      {% include "_avatar.html" with person=rel.mentor %}
+      <span><strong>{{ rel.mentor }}</strong> · your mentor<br>
+    {% endif %}
+      <span class="muted">{{ rel.started_at|date:"j M Y" }} – {% if rel.ended_at %}{{ rel.ended_at|date:"j M Y" }}{% else %}present{% endif %}</span></span>
+  </div>
+  {% empty %}
+  <p class="empty">No mentoring relationships yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

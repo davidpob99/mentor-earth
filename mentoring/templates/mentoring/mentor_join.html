@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{% if mentor_profile %}Mentoring settings{% else %}Become a mentor{% endif %} · Mentoring{% endblock %}
+{% block content %}
+<section class="panel narrow">
+  {% if mentor_profile %}
+  <h1>Mentoring settings</h1>
+  {% else %}
+  <h1>Become a mentor 🌱</h1>
+  <p class="lead">Your name, research topic and career stage come from your profile. You can pause or leave mentoring at any time.</p>
+  {% endif %}
+  <form method="post" novalidate>{% csrf_token %}
+    {{ form.non_field_errors }}
+    {% include "_field.html" with field=form.capacity %}
+    {% include "_field.html" with field=form.contact_preference %}
+    {% include "_field.html" with field=form.slack_handle %}
+    {% include "_field.html" with field=form.superpower %}
+    {% include "_field.html" with field=form.superpower_other %}
+    <div class="actions">
+      <button class="btn primary" type="submit">{% if mentor_profile %}Save{% else %}Become a mentor{% endif %}</button>
+      <a class="btn" href="{% url 'mentoring:profile' %}">Cancel</a>
+    </div>
+  </form>
+</section>
+<script>
+  // Only show the follow-up fields when the answer above makes them relevant.
+  (function () {
+    const form = document.querySelector("form[method=post]");
+    const slack = document.getElementById("field-slack_handle");
+    const other = document.getElementById("field-superpower_other");
+    function sync() {
+      const contact = form.querySelector("input[name=contact_preference]:checked");
+      const power = form.querySelector("input[name=superpower]:checked");
+      slack.hidden = !(contact && contact.value !== "email");
+      other.hidden = !(power && power.value === "other");
+    }
+    form.addEventListener("change", sync);
+    sync();
+  })();
+</script>
+{% endblock %}

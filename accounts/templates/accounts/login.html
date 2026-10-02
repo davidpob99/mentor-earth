@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Sign in · Mentoring{% endblock %}
+{% block content %}
+<section class="panel narrow">
+  <h1>Research group mentoring</h1>
+  <p class="lead">Find someone to talk to about research, career or academia, or offer to be that person.</p>
+  <form method="post" novalidate>{% csrf_token %}
+    {% include "_field.html" with field=form.email %}
+    <button class="btn primary block" type="submit">Email me a sign-in code</button>
+  </form>
+  <p class="hint">Access is by invitation. No password needed.</p>
+</section>
+{% endblock %}

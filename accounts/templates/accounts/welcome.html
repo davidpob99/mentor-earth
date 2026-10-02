@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Welcome · Mentoring{% endblock %}
+{% block content %}
+<section class="panel narrow">
+  <h1>Welcome 👋</h1>
+  <p class="lead">Three quick things so others know who you are. It takes under a minute.</p>
+  <form method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+    {% for field in form %}{% include "_field.html" %}{% endfor %}
+    <button class="btn primary block" type="submit">Continue</button>
+  </form>
+</section>
+{% endblock %}

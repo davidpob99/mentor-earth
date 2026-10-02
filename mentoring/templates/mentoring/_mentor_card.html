@@ -1,0 +1,9 @@
+<article class="card mentor-card">
+  {% include "_avatar.html" with person=profile.user size="lg" %}
+  <h3>{{ profile.user }}</h3>
+  <p class="muted">{{ profile.user.get_career_stage_display }}</p>
+  <p>{{ profile.user.research_topic }}</p>
+  <p class="superpower">{{ profile.superpower_display }}</p>
+  <p class="available">Available · {{ profile.free_places }} place{{ profile.free_places|pluralize }}</p>
+  <a class="btn primary block" href="{% url 'mentoring:mentor_detail' profile.user_id %}">View {{ profile.user.first_name }}</a>
+</article>
