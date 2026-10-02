@@ -6,17 +6,24 @@ Configuration that differs between environments is read from environment variabl
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Optional local configuration; real environment variables take precedence.
+load_dotenv(BASE_DIR / ".env")
 
 
 def env_bool(name, default=False):
     return os.environ.get(name, str(default)).lower() in {"1", "true", "yes", "on"}
 
 
-SECRET_KEY = os.environ.get(
-    "SECRET_KEY", "django-insecure-dev-only-change-me-in-production"
-)
+DEV_SECRET_KEY = "django-insecure-dev-only-change-me-in-production"
+SECRET_KEY = os.environ.get("SECRET_KEY", DEV_SECRET_KEY)
 DEBUG = env_bool("DEBUG", True)
+if not DEBUG and SECRET_KEY == DEV_SECRET_KEY:
+    raise ImproperlyConfigured("Set SECRET_KEY in the environment or .env when DEBUG is false.")
 ALLOWED_HOSTS = [h for h in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h]
 CSRF_TRUSTED_ORIGINS = [o for o in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if o]
 
